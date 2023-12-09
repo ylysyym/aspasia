@@ -17,7 +17,7 @@ use crate::{
     TimedEvent, TimedEventInterface, TimedMicroDvdSubtitle, TimedSubtitleFile, WebVttSubtitle,
 };
 
-use super::parse::{parse_non_tags, parse_srt};
+use super::parse::{parse_srt, strip_srt_formatting};
 
 /// SubRip (.srt) subtitle data, containing only a list of events.
 #[derive(Clone, Debug)]
@@ -301,7 +301,7 @@ impl From<TimedSubtitleFile> for SubRipSubtitle {
 
 impl TextEvent for SubRipEvent {
     fn unformatted_text(&self) -> Cow<'_, String> {
-        let Ok((_, stripped)) = parse_non_tags(self.text.as_str()) else {
+        let Ok((_, stripped)) = strip_srt_formatting(self.text.as_str()) else {
             return Cow::Borrowed(&self.text);
         };
 

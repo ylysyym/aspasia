@@ -1,8 +1,8 @@
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_until, take_while1},
+    bytes::complete::{tag, take_until},
     combinator::{eof, map, rest, value},
-    multi::{many0, many_till},
+    multi::many_till,
     IResult, Parser,
 };
 
@@ -48,8 +48,8 @@ pub(crate) fn ssa_to_vtt_formatting(input: &str) -> IResult<&str, String> {
 
 pub(crate) fn strip_formatting_tags(input: &str) -> IResult<&str, String> {
     map(
-        many0(alt((discard_tag, take_until("{"), take_while1(|_| true)))),
-        |s| s.join("").to_string(),
+        many_till(alt((discard_tag, take_until("{"), rest)), eof),
+        |(s, _)| s.join("").to_string(),
     )
     .parse(input)
 }

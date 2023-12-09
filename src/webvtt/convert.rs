@@ -1,9 +1,9 @@
 use nom::{
     branch::alt,
-    bytes::complete::{tag, take_until, take_while1},
+    bytes::complete::{tag, take_until},
     character::complete::char,
     combinator::{eof, map, rest, value},
-    multi::{many0, many_till},
+    multi::many_till,
     sequence::tuple,
     IResult, Parser,
 };
@@ -64,11 +64,8 @@ fn discard_html_tag(input: &str) -> IResult<&str, &str> {
 
 pub(crate) fn discard_html_tags(input: &str) -> IResult<&str, String> {
     map(
-        many0(alt((
-            discard_html_tag,
-            alt((take_until("<"), take_while1(|_| true))),
-        ))),
-        |s| s.join("").to_string(),
+        many_till(alt((discard_html_tag, take_until("<"), rest)), eof),
+        |(s, _)| s.join("").to_string(),
     )
     .parse(input)
 }

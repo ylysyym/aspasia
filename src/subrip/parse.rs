@@ -4,8 +4,8 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until, take_while1},
     character::complete::{char, i64, line_ending, multispace0, space0, u32},
-    combinator::{map, opt, value},
-    multi::{many0, separated_list1},
+    combinator::{eof, map, opt, rest, value},
+    multi::{many0, many_till, separated_list1},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult, Parser,
 };
@@ -134,14 +134,18 @@ fn parse_html_tag(input: &str) -> IResult<&str, &str> {
     value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
 }
 
-pub(crate) fn parse_non_tags(input: &str) -> IResult<&str, String> {
+pub(crate) fn strip_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
-        many0(alt((
-            parse_html_tag,
-            parse_formatting_tag,
-            take_while1(|c| c != '<' && c != '{'),
-        ))),
-        |s| s.join("").to_string(),
+        many_till(
+            alt((
+                parse_html_tag,
+                parse_formatting_tag,
+                take_while1(|c| c != '<' && c != '{'),
+                rest,
+            )),
+            eof,
+        ),
+        |(s, _)| s.join("").to_string(),
     )
     .parse(input)
 }

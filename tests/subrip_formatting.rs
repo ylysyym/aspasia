@@ -41,3 +41,16 @@ fn mixed_tags() {
 
     assert_eq!(srt.event(0).unwrap().text, "Strip this away")
 }
+
+#[test]
+fn terminating_bracket() {
+    let mut srt = SubRipSubtitle::from_str(
+        "1
+00:00:00,000 --> 00:00:03,000
+Some <>text<",
+    )
+    .unwrap();
+    srt.strip_formatting();
+
+    assert_eq!(srt.event(0).unwrap().text, "Some text<");
+}
