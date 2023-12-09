@@ -208,7 +208,7 @@ impl From<&AssSubtitle> for TimedMicroDvdSubtitle {
                 .events()
                 .iter()
                 .map(|line| TimedMicroDvdEvent {
-                    text: line.unformatted_text().replace('\n', "|"),
+                    text: line.as_plaintext().replace('\n', "|"),
                     start: line.start,
                     end: line.end,
                 })
@@ -225,7 +225,7 @@ impl From<&SsaSubtitle> for TimedMicroDvdSubtitle {
                 .events()
                 .iter()
                 .map(|line| TimedMicroDvdEvent {
-                    text: line.unformatted_text().replace('\n', "|"),
+                    text: line.as_plaintext().replace('\n', "|"),
                     start: line.start,
                     end: line.end,
                 })
@@ -242,7 +242,7 @@ impl From<&SubRipSubtitle> for TimedMicroDvdSubtitle {
                 .events()
                 .iter()
                 .map(|line| TimedMicroDvdEvent {
-                    text: line.unformatted_text().replace('\n', "|"),
+                    text: line.as_plaintext().replace('\n', "|"),
                     start: line.start,
                     end: line.end,
                 })
@@ -259,7 +259,7 @@ impl From<&WebVttSubtitle> for TimedMicroDvdSubtitle {
                 .events()
                 .iter()
                 .map(|line| TimedMicroDvdEvent {
-                    text: line.unformatted_text().replace('\n', "|"),
+                    text: line.as_plaintext().replace('\n', "|"),
                     start: line.start,
                     end: line.end,
                 })
@@ -271,6 +271,10 @@ impl From<&WebVttSubtitle> for TimedMicroDvdSubtitle {
 
 impl TextEvent for TimedMicroDvdEvent {
     fn unformatted_text(&self) -> Cow<'_, String> {
+        Cow::Borrowed(&self.text)
+    }
+
+    fn as_plaintext(&self) -> Cow<'_, String> {
         Cow::Owned(self.text.replace('|', "\n"))
     }
 }

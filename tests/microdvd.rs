@@ -1,6 +1,6 @@
 use std::str::FromStr;
 
-use aspasia::{MicroDvdSubtitle, Moment, Subtitle, TimedMicroDvdSubtitle};
+use aspasia::{MicroDvdSubtitle, Moment, Subtitle, TextEvent, TimedMicroDvdSubtitle};
 
 const SUB_TEXT: &str = "{1}{450}One
 {460}{510}Two
@@ -52,4 +52,18 @@ fn framerate_modification() {
 
     assert_eq!(sub.event(0).unwrap().start, Moment::from(56));
     assert_eq!(sub.event(0).unwrap().end, Moment::from(25000));
+}
+
+#[test]
+fn convert_newlines() {
+    let sub = TimedMicroDvdSubtitle::from_str("{0}{9}Hello|there").unwrap();
+
+    assert_eq!(
+        sub.event(0).unwrap().unformatted_text().to_string(),
+        "Hello|there"
+    );
+    assert_eq!(
+        sub.event(0).unwrap().as_plaintext().to_string(),
+        "Hello\nthere"
+    );
 }

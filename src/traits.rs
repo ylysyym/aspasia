@@ -102,6 +102,14 @@ pub trait TextEvent: TextEventInterface {
 
     /// Get text content with all formatting tags removed
     fn unformatted_text(&self) -> Cow<'_, String>;
+
+    /// Get text in plaintext, without formatting and with no character escapes.
+    ///
+    /// As an example, this differs from `unformatted_text()` for SubStation files,
+    /// where `\N` is converted to an actual newline character, `\n`.
+    fn as_plaintext(&self) -> Cow<'_, String> {
+        self.unformatted_text()
+    }
 }
 
 /// Interface for getting/modifying textual subtitle event fields.

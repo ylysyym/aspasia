@@ -618,6 +618,10 @@ impl TextEvent for AssEvent {
 
         Cow::Owned(stripped)
     }
+
+    fn as_plaintext(&self) -> Cow<'_, String> {
+        Cow::Owned(self.unformatted_text().replace("\\N", "\n"))
+    }
 }
 
 impl TimedEvent for AssEvent {}

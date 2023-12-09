@@ -74,7 +74,7 @@ where
                 .events()
                 .iter()
                 .map(|e| PlainEvent {
-                    text: e.unformatted_text().into_owned(),
+                    text: e.as_plaintext().into_owned(),
                     start: e.start(),
                     end: e.end(),
                 })
