@@ -1,0 +1,20 @@
+[package]
+name = "aspasia"
+version = "0.1.0"
+authors = ["ylysyym <ylysyym@gmail.com>"]
+repository = "https://github.com/ylysyym/aspasia"
+readme = "README.md"
+keywords = ["parser", "subtitle", "subtitles"]
+categories = ["Encoding", "Parser implementations"]
+edition = "2021"
+description = "Library for parsing and working with subtitles"
+license = "0BSD"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+buildstructor = "0.5"
+chardetng = "0.1"
+encoding_rs = "0.8"
+encoding_rs_io = "0.1"
+nom = "7.1"
