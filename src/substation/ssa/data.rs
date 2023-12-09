@@ -384,7 +384,6 @@ impl Display for SsaSubtitle {
 impl FromStr for SsaSubtitle {
     type Err = Error;
 
-    /// Load subtitle data from string
     fn from_str(s: &str) -> Result<Self, Self::Err> {
         let reader = BufReader::new(s.as_bytes());
 

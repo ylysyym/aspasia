@@ -13,11 +13,11 @@ use crate::{
 /// you should convert to the format-specific types using `from()` or `into()`
 #[derive(Debug)]
 pub enum TimedSubtitleFile {
-    /// File in Advanced SubStation Alpha (V4+) (.ass) format
+    /// File in Advanced SubStation Alpha V4+ (.ass) format
     Ass(AssSubtitle),
     /// Timed version of file in MicroDVD (.sub) format
     MicroDvd(TimedMicroDvdSubtitle),
-    /// File in Substation Alpha (V4) (.ssa) format
+    /// File in Substation Alpha V4 (.ssa) format
     Ssa(SsaSubtitle),
     /// File in SubRip (.srt) format
     SubRip(SubRipSubtitle),
@@ -28,11 +28,11 @@ pub enum TimedSubtitleFile {
 /// Supported file formats
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Format {
-    /// Advanced SubStation Alpha (.ass) subtitle
+    /// Advanced SubStation Alpha V4+ (.ass) subtitle
     Ass,
     /// MicroDVD (.sub) subtitle
     MicroDvd,
-    /// SubStation Alpha (.ssa) subtitle
+    /// SubStation Alpha V4 (.ssa) subtitle
     Ssa,
     /// SubRip (.srt) subtitle
     SubRip,

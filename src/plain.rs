@@ -6,7 +6,6 @@ use crate::{
 /// Basic subtitle data containing only the textual content and start/end timing with no style or formatting information
 #[derive(Clone, Debug)]
 pub struct PlainSubtitle {
-    /// List of events for the subtitle
     events: Vec<PlainEvent>,
 }
 
@@ -67,7 +66,8 @@ impl<T: TimedSubtitle + TextSubtitle> From<&T> for PlainSubtitle
 where
     T::Event: TimedEvent + TextEvent,
 {
-    /// Convert from any implementor of `SubtitleFormat`. Strips all formatting tags from the text.
+    /// Convert from any implementor of `TimedSubtitle` and `TextSubtitle`.
+    /// This strips all formatting tags from the text.
     fn from(value: &T) -> Self {
         Self {
             events: value

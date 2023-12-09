@@ -15,9 +15,13 @@ use super::{convert::discard_html_tags, parse::parse_vtt};
 /// WebVTT (.vtt) subtitle data
 #[derive(Clone, Debug, Builder)]
 pub struct WebVttSubtitle {
+    /// Header
     header: Option<String>,
+    /// List of cues
     cues: Vec<WebVttCue>,
+    /// List of styles (strings)
     styles: Vec<String>,
+    /// List of regions (strings)
     regions: Vec<String>,
 }
 
@@ -106,10 +110,6 @@ impl WebVttSubtitle {
     }
 }
 
-impl TextSubtitle for WebVttSubtitle {}
-
-impl TimedSubtitle for WebVttSubtitle {}
-
 impl Subtitle for WebVttSubtitle {
     type Event = WebVttCue;
 
@@ -136,6 +136,10 @@ impl Subtitle for WebVttSubtitle {
         self.cues.as_mut_slice()
     }
 }
+
+impl TextSubtitle for WebVttSubtitle {}
+
+impl TimedSubtitle for WebVttSubtitle {}
 
 impl Display for WebVttSubtitle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
