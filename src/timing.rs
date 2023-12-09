@@ -81,6 +81,15 @@ impl Moment {
             self.cs()
         )
     }
+
+    pub(crate) fn from_timestamp(
+        hours: i64,
+        minutes: i64,
+        seconds: i64,
+        milliseconds: i64,
+    ) -> Moment {
+        (hours * 60 * 60 * 1000 + minutes * 60 * 1000 + seconds * 1000 + milliseconds).into()
+    }
 }
 
 impl Sub for Moment {

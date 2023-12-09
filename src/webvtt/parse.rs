@@ -10,10 +10,7 @@ use nom::{
     IResult, Parser,
 };
 
-use crate::{
-    parsing::{as_moment, take_until_end_of_block},
-    Moment, WebVttSubtitle,
-};
+use crate::{parsing::take_until_end_of_block, Moment, WebVttSubtitle};
 
 use super::data::WebVttCue;
 
@@ -42,7 +39,7 @@ fn parse_timestamp(input: &str) -> IResult<&str, Moment> {
                 terminated(i64, char('.')),
                 terminated(i64, space0),
             )),
-            |(h, m, s, ms)| as_moment(h, m, s, ms),
+            |(h, m, s, ms)| Moment::from_timestamp(h, m, s, ms),
         ),
         map(
             tuple((
@@ -50,7 +47,7 @@ fn parse_timestamp(input: &str) -> IResult<&str, Moment> {
                 terminated(i64, char('.')),
                 terminated(i64, space0),
             )),
-            |(m, s, ms)| as_moment(0, m, s, ms),
+            |(m, s, ms)| Moment::from_timestamp(0, m, s, ms),
         ),
     ))
     .parse(input)

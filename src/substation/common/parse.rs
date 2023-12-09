@@ -8,7 +8,7 @@ use nom::{
     IResult, Parser,
 };
 
-use crate::{parsing::as_moment, Format, Moment};
+use crate::{Format, Moment};
 
 use super::data::{SubStationFont, SubStationGraphic};
 
@@ -151,7 +151,7 @@ pub(crate) fn parse_timestamp(input: &str) -> IResult<&str, Moment> {
             )),
             space0,
         ),
-        |(h, m, s, cs)| as_moment(h, m, s, cs * 10),
+        |(h, m, s, cs)| Moment::from_timestamp(h, m, s, cs * 10),
     )
     .parse(input)
 }

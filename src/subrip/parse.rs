@@ -10,10 +10,7 @@ use nom::{
     IResult, Parser,
 };
 
-use crate::{
-    parsing::{as_moment, take_until_end_of_block},
-    Moment, SubRipSubtitle,
-};
+use crate::{parsing::take_until_end_of_block, Moment, SubRipSubtitle};
 
 use super::data::SubRipEvent;
 
@@ -35,7 +32,7 @@ fn parse_timestamp(input: &str) -> IResult<&str, Moment> {
             )),
             space0,
         ),
-        |(h, m, s, ms)| as_moment(h, m, s, ms),
+        |(h, m, s, ms)| Moment::from_timestamp(h, m, s, ms),
     )
     .parse(input)
 }
