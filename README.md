@@ -19,13 +19,20 @@ Parsing of formats is done somewhat loosely, meaning that it will make a best ef
 
 ## Documentation
 
-TODO add link to docs here
+https://docs.rs/aspasia/latest/aspasia/
 
 ## Usage
 
 ### Installation
 
-TODO add installation info here
+You can add aspasia to your project using Cargo: `cargo add aspasia`
+
+...or you can edit your `Cargo.toml` to add:
+
+```toml
+[dependencies]
+aspasia = "0.1"
+```
 
 ### Examples
 
