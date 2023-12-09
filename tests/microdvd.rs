@@ -39,3 +39,17 @@ fn lossless_conversion() {
 
     assert_eq!(SUB_TEXT, out);
 }
+
+#[test]
+fn framerate_modification() {
+    let mut sub = TimedMicroDvdSubtitle::from_str(SUB_TEXT).unwrap();
+    sub.set_framerate(100.0);
+
+    assert_eq!(sub.event(0).unwrap().start, Moment::from(42));
+    assert_eq!(sub.event(0).unwrap().end, Moment::from(18750));
+
+    sub.update_framerate(75.0);
+
+    assert_eq!(sub.event(0).unwrap().start, Moment::from(56));
+    assert_eq!(sub.event(0).unwrap().end, Moment::from(25000));
+}
