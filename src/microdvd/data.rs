@@ -134,11 +134,8 @@ impl TimedMicroDvdSubtitle {
     ///
     /// This will also recalculate and update all event timings to match the new framerate.
     pub fn update_framerate(&mut self, framerate: FrameRate) {
-        let ratio = framerate / self.framerate;
         for event in &mut self.events {
-            event.start =
-                Moment::from(((i64::from(event.start) as FrameRate) * ratio).round() as i64);
-            //event.end = Moment::from(((i64::from(event.end) as FrameRate) * ratio).round() as i64);
+            event.start = frame_to_moment(moment_to_frame(event.start, self.framerate), framerate);
             event.end = frame_to_moment(moment_to_frame(event.end, self.framerate), framerate);
         }
         self.framerate = framerate;
