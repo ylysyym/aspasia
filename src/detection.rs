@@ -16,11 +16,76 @@ use crate::{
     Error, Format,
 };
 
+/// Attempt to detect subtitle format from its extension first, then by file contents if that fails
+///
+/// # Errors
+///
+/// - Returns [`Error::FileIoError`] if an error results while attempting to open the file for encoding detection or content detection.
+/// - Returns [`Error::FormatUnknownError`] if unable to conclusively determine a single format.
+pub fn detect_format(path: impl AsRef<Path>) -> Result<Format, Error> {
+    if let Ok(format) = detect_format_by_extension(path.as_ref()) {
+        return Ok(format);
+    }
+
+    detect_format_by_content(path.as_ref())
+}
+
+/// Attempt to detect subtitle format from its extension first, then by file contents using the given encoding if that fails
+///
+/// # Errors
+///
+/// - Returns [`Error::FileIoError`] if an error results while attempting to open the file for content detection.
+/// - Returns [`Error::FormatUnknownError`] if unable to conclusively determine a single format.
+pub fn detect_format_with_encoding(
+    path: impl AsRef<Path>,
+    encoding: Option<&'static Encoding>,
+) -> Result<Format, Error> {
+    if let Ok(format) = detect_format_by_extension(path.as_ref()) {
+        return Ok(format);
+    }
+
+    detect_format_by_content_with_encoding(path.as_ref(), encoding)
+}
+
+/// Attempt to detect subtitle format using its file extension
+///
+/// # Errors
+///
+/// Returns [`Error::FormatUnknownError`] if file extension is not recognised
+pub fn detect_format_by_extension(path: impl AsRef<Path>) -> Result<Format, Error> {
+    let ext = path.as_ref().extension();
+    match ext
+        .map(std::ffi::OsStr::to_ascii_lowercase)
+        .unwrap_or_default()
+        .to_str()
+    {
+        Some("ass") => Ok(Format::Ass),
+        Some("ssa") => Ok(Format::Ssa),
+        Some("srt") => Ok(Format::SubRip),
+        Some("sub") => Ok(Format::MicroDvd),
+        Some("vtt") => Ok(Format::WebVtt),
+        _ => Err(Error::FormatUnknownError),
+    }
+}
+
+/// Attempt to detect subtitle format from file contents
+///
+/// # Errors
+///
+/// - Returns [`Error::FileIoError`] if an error results while attempting to open the file for encoding detection or format detection.
+/// - Returns [`Error::FormatUnknownError`] if unable to conclusively determine a single format.
+pub fn detect_format_by_content(path: impl AsRef<Path>) -> Result<Format, Error> {
+    let encoding = detect_file_encoding(path.as_ref(), None).ok();
+
+    detect_format_by_content_with_encoding(path, encoding)
+}
+
 /// Attempt to detect subtitle format from file contents, using specified encoding to read file
 ///
 /// # Errors
 ///
-/// Returns [`Error::UnknownFileTypeError`] if unable to conclusively determine a single format.
+/// - Returns [`Error::FileIoError`] if an error results while attempting to open the file for content detection.
+/// - Returns [`Error::FormatUnknownError`] if unable to conclusively determine a single format.
 pub fn detect_format_by_content_with_encoding(
     path: impl AsRef<Path>,
     encoding: Option<&'static Encoding>,
@@ -48,56 +113,11 @@ pub fn detect_format_by_content_with_encoding(
     detect_format_from_str(texts.join("\n").as_str())
 }
 
-/// Attempt to detect subtitle format from file contents
-///
-/// # Errors
-///
-/// Returns [`Error::UnknownFileTypeError`] if unable to conclusively determine a single format.
-pub fn detect_format_by_content(path: impl AsRef<Path>) -> Result<Format, Error> {
-    let encoding = detect_file_encoding(path.as_ref(), None).ok();
-
-    detect_format_by_content_with_encoding(path, encoding)
-}
-
-/// Attempt to detect subtitle format using its file extension
-///
-/// # Errors
-///
-/// Returns [`Error::UnknownFileTypeError`] if file extension is not recognised
-pub fn detect_format_by_extension(path: impl AsRef<Path>) -> Result<Format, Error> {
-    let ext = path.as_ref().extension();
-    match ext
-        .map(std::ffi::OsStr::to_ascii_lowercase)
-        .unwrap_or_default()
-        .to_str()
-    {
-        Some("ass") => Ok(Format::Ass),
-        Some("ssa") => Ok(Format::Ssa),
-        Some("srt") => Ok(Format::SubRip),
-        Some("sub") => Ok(Format::MicroDvd),
-        Some("vtt") => Ok(Format::WebVtt),
-        _ => Err(Error::UnknownFileTypeError),
-    }
-}
-
-/// Attempt to detect subtitle format from its extension first, then by file contents if that fails
-///
-/// # Errors
-///
-/// Returns [`Error::UnknownFileTypeError`] if unable to conclusively determine a single format.
-pub fn detect_format(path: impl AsRef<Path>) -> Result<Format, Error> {
-    if let Ok(format) = detect_format_by_extension(path.as_ref()) {
-        return Ok(format);
-    }
-
-    detect_format_by_content(path.as_ref())
-}
-
 /// Attempt to detect subtitle format from text of the first few lines of the subtitle
 ///
 /// # Errors
 ///
-/// Returns [`Error::UnknownFileTypeError`] if unable to conclusively determine a single format.
+/// Returns [`Error::FormatUnknownError`] if unable to conclusively determine a single format.
 pub fn detect_format_from_str(text: &str) -> Result<Format, Error> {
     if parse_header(text).is_ok() {
         return Ok(Format::WebVtt);
@@ -116,21 +136,5 @@ pub fn detect_format_from_str(text: &str) -> Result<Format, Error> {
         return Ok(Format::MicroDvd);
     }
 
-    Err(Error::UnknownFileTypeError)
-}
-
-/// Attempt to detect subtitle format from its extension first, then by file contents using the given encoding if that fails
-///
-/// # Errors
-///
-/// Returns [`Error::UnknownFileTypeError`] if unable to conclusively determine a single format.
-pub fn detect_format_with_encoding(
-    path: impl AsRef<Path>,
-    encoding: Option<&'static Encoding>,
-) -> Result<Format, Error> {
-    if let Ok(format) = detect_format_by_extension(path.as_ref()) {
-        return Ok(format);
-    }
-
-    detect_format_by_content_with_encoding(path.as_ref(), encoding)
+    Err(Error::FormatUnknownError)
 }

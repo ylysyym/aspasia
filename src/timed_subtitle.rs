@@ -47,9 +47,8 @@ impl TimedSubtitleFile {
     ///
     /// # Errors
     ///
-    /// If an error is encountered while opening the file, returns [`Error::FileIoError`]
-    ///
-    /// If the format cannot be successfully detected, returns [`Error::UnknownFileTypeError`]
+    /// - If an error is encountered while opening the file, returns [`Error::FileIoError`]
+    /// - If the format cannot be successfully detected, returns [`Error::FormatUnknownError`]
     pub fn new(path: impl AsRef<Path>) -> Result<Self, Error> {
         let encoding = detect_file_encoding(path.as_ref(), None).ok();
         let format = detect_format_with_encoding(path.as_ref(), encoding)?;

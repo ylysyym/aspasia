@@ -5,8 +5,8 @@ use std::fmt::{Debug, Display};
 pub enum Error {
     /// Error opening or creating a file
     FileIoError(std::io::Error),
-    /// Error trying to recognise file type
-    UnknownFileTypeError,
+    /// Error caused by being unable to detect subtitle format automatically
+    FormatUnknownError,
 }
 
 impl std::error::Error for Error {}
@@ -28,8 +28,8 @@ impl Display for Error {
                 f,
                 "file i/o error occurred while trying to read or write from a file: {err:?}"
             ),
-            Error::UnknownFileTypeError => {
-                write!(f, "could not detect file type automatically")
+            Error::FormatUnknownError => {
+                write!(f, "could not detect subtitle format automatically")
             }
         }
     }
