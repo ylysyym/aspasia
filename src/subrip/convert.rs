@@ -84,7 +84,7 @@ fn replace_font_color_tag(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_ass_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn srt_to_ass_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((
@@ -104,7 +104,7 @@ pub(crate) fn convert_to_ass_formatting(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_ssa_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn srt_to_ssa_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((
@@ -124,7 +124,7 @@ pub(crate) fn convert_to_ssa_formatting(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_vtt_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn srt_to_vtt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((

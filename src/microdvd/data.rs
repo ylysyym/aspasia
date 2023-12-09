@@ -150,7 +150,7 @@ impl Subtitle for TimedMicroDvdSubtitle {
     fn from_path_with_encoding(
         path: impl AsRef<std::path::Path>,
         encoding: Option<&'static encoding_rs::Encoding>,
-    ) -> Result<Self, crate::Error> {
+    ) -> Result<Self, Error> {
         let mut enc = encoding.or_else(|| detect_file_encoding(path.as_ref(), Some(30)).ok());
         let mut result = Self::open_file_with_encoding(path.as_ref(), enc);
 

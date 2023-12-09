@@ -18,7 +18,7 @@ fn convert_to_html_tag(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_srt_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn ssa_to_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((
@@ -35,7 +35,7 @@ pub(crate) fn convert_to_srt_formatting(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_vtt_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn ssa_to_vtt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((convert_to_html_tag, discard_tag, take_until("{"), rest)),

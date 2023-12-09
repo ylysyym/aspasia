@@ -8,8 +8,10 @@ use crate::{
     encoding::detect_file_encoding,
     errors::Error,
     plain::PlainSubtitle,
+    subrip::convert::srt_to_ass_formatting,
     substation::common::data::{SubStationEventKind, SubStationFont, SubStationGraphic},
     traits::TimedSubtitle,
+    webvtt::convert::vtt_to_ass_formatting,
     Moment, SsaSubtitle, SubRipSubtitle, Subtitle, TextEvent, TextEventInterface, TextSubtitle,
     TimedEvent, TimedEventInterface, TimedMicroDvdSubtitle, TimedSubtitleFile, WebVttSubtitle,
 };
@@ -481,9 +483,7 @@ impl From<&SubRipSubtitle> for AssSubtitle {
                     .iter()
                     .map(|line| {
                         let mut text = line.text.replace('\n', "\\N");
-                        if let Ok((_, converted)) =
-                            crate::subrip::convert::convert_to_ass_formatting(text.as_str())
-                        {
+                        if let Ok((_, converted)) = srt_to_ass_formatting(text.as_str()) {
                             text = converted;
                         }
                         AssEvent {
@@ -522,9 +522,7 @@ impl From<&WebVttSubtitle> for AssSubtitle {
                     .iter()
                     .map(|cue| {
                         let mut text = cue.text.replace('\n', "\\N");
-                        if let Ok((_, converted)) =
-                            crate::webvtt::convert::convert_to_ass_formatting(text.as_str())
-                        {
+                        if let Ok((_, converted)) = vtt_to_ass_formatting(text.as_str()) {
                             text = converted;
                         }
                         AssEvent {

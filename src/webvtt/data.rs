@@ -5,7 +5,15 @@ use encoding_rs::Encoding;
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
 use crate::{
-    encoding::detect_file_encoding, errors::Error, plain::PlainSubtitle, traits::TimedSubtitle,
+    encoding::detect_file_encoding,
+    errors::Error,
+    plain::PlainSubtitle,
+    subrip::convert::srt_to_vtt_formatting,
+    substation::{
+        ass::convert::ass_to_vtt_formatting, common::convert::split_formatting_tags,
+        ssa::convert::ssa_to_vtt_formatting,
+    },
+    traits::TimedSubtitle,
     AssSubtitle, Moment, SsaSubtitle, SubRipSubtitle, Subtitle, TextEvent, TextEventInterface,
     TextSubtitle, TimedEvent, TimedEventInterface, TimedMicroDvdSubtitle, TimedSubtitleFile,
 };
@@ -193,14 +201,8 @@ impl From<&AssSubtitle> for WebVttSubtitle {
                 .iter()
                 .map(|dialogue| {
                     let mut text = dialogue.text.replace("\\N", "\n");
-                    if let Ok((_, separated)) =
-                        crate::substation::common::convert::split_formatting_tags(text.as_str())
-                    {
-                        if let Ok((_, converted)) =
-                            crate::substation::ass::convert::convert_to_vtt_formatting(
-                                separated.as_str(),
-                            )
-                        {
+                    if let Ok((_, separated)) = split_formatting_tags(text.as_str()) {
+                        if let Ok((_, converted)) = ass_to_vtt_formatting(separated.as_str()) {
                             text = converted;
                         }
                     }
@@ -250,14 +252,8 @@ impl From<&SsaSubtitle> for WebVttSubtitle {
                 .iter()
                 .map(|dialogue| {
                     let mut text = dialogue.text.replace("\\N", "\n");
-                    if let Ok((_, separated)) =
-                        crate::substation::common::convert::split_formatting_tags(text.as_str())
-                    {
-                        if let Ok((_, converted)) =
-                            crate::substation::ssa::convert::convert_to_vtt_formatting(
-                                separated.as_str(),
-                            )
-                        {
+                    if let Ok((_, separated)) = split_formatting_tags(text.as_str()) {
+                        if let Ok((_, converted)) = ssa_to_vtt_formatting(separated.as_str()) {
                             text = converted;
                         }
                     }
@@ -292,9 +288,7 @@ impl From<&SubRipSubtitle> for WebVttSubtitle {
                 .iter()
                 .map(|line| {
                     let mut text = line.text.clone();
-                    if let Ok((_, converted)) =
-                        crate::subrip::convert::convert_to_vtt_formatting(text.as_str())
-                    {
+                    if let Ok((_, converted)) = srt_to_vtt_formatting(text.as_str()) {
                         text = converted;
                     }
                     WebVttCue {

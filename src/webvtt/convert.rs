@@ -36,7 +36,7 @@ fn keep_html_tags(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_ass_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn vtt_to_ass_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((convert_to_ass_tag, discard_tag, take_until("<"), rest)),
@@ -47,7 +47,7 @@ pub(crate) fn convert_to_ass_formatting(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn convert_to_srt_formatting(input: &str) -> IResult<&str, String> {
+pub(crate) fn vtt_to_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((keep_html_tags, discard_tag, take_until("<"), rest)),
