@@ -12,7 +12,7 @@ use encoding_rs::Encoding;
 use crate::{errors::Error, Moment, TimeDelta};
 
 /// Base trait for all subtitle implementations.
-pub trait Subtitle: Sized + Display + FromStr {
+pub trait Subtitle: Display + FromStr {
     /// Event type for the given subtitle format
     type Event;
 
