@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until, take_while1},
     character::complete::{char, i64, line_ending, multispace0, space0, u32},
-    combinator::{eof, map, opt, rest, value},
+    combinator::{eof, fail, map, opt, rest, value},
     multi::{many0, many_till, separated_list1},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult, Parser,
@@ -15,9 +15,9 @@ use crate::{parsing::take_until_end_of_block, Moment, SubRipSubtitle};
 use super::data::SubRipEvent;
 
 #[derive(Debug)]
-pub(crate) enum SubRipBlock<'a> {
+pub(crate) enum SubRipBlock {
     NewLine(SubRipEvent),
-    LineContinuation(&'a str),
+    LineContinuation(String),
 }
 
 fn parse_timestamp(input: &str) -> IResult<&str, Moment> {
@@ -69,11 +69,19 @@ pub(crate) fn parse_new_line(input: &str) -> IResult<&str, SubRipBlock> {
 }
 
 fn parse_continuation(input: &str) -> IResult<&str, SubRipBlock> {
-    map(take_until("\n\n"), SubRipBlock::LineContinuation).parse(input)
+    // TODO: surely there's a better way to do this
+    let continuation = take_until_end_of_block.parse(input);
+    if let Ok(parsed) = continuation {
+        if !parsed.1.is_empty() {
+            return Ok((parsed.0, SubRipBlock::LineContinuation(parsed.1)));
+        }
+    }
+
+    fail(input)
 }
 
 fn parse_block(input: &str) -> IResult<&str, SubRipBlock> {
-    preceded(multispace0, alt((parse_new_line, parse_continuation))).parse(input)
+    alt((preceded(multispace0, parse_new_line), parse_continuation)).parse(input)
 }
 
 pub(crate) fn parse_blocks(input: &str) -> IResult<&str, Vec<SubRipBlock>> {
@@ -114,7 +122,7 @@ pub(crate) fn parse_srt<T: Read>(reader: BufReader<T>) -> SubRipSubtitle {
                     if let Some(line) = events.last_mut() {
                         line.text.push('\n');
                         line.text.push('\n');
-                        line.text.push_str(content);
+                        line.text.push_str(content.as_str());
                     }
                 }
             }

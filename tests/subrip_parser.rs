@@ -106,3 +106,31 @@ fn renumbering() {
     assert_eq!(srt.event(0).unwrap().line_number, 1);
     assert_eq!(srt.event(1).unwrap().line_number, 2);
 }
+
+#[test]
+fn ending_continuation() {
+    let srt = SubRipSubtitle::from_str(
+        "1
+00:00:00,600 --> 00:00:01,400
+Some
+
+
+stuff
+
+
+2
+00:00:02,800 --> 00:00:04,400
+Broken
+
+up
+
+text
+exists
+",
+    )
+    .unwrap();
+
+    assert_eq!(srt.events().len(), 2);
+    assert_eq!(srt.event(0).unwrap().text, "Some\n\n\nstuff");
+    assert_eq!(srt.event(1).unwrap().text, "Broken\n\nup\n\ntext\nexists");
+}
