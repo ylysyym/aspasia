@@ -8,9 +8,10 @@ use nom::{
     IResult, Parser,
 };
 
-use crate::{Format, Moment};
-
-use super::data::{SubStationFont, SubStationGraphic};
+use crate::{
+    substation::{SubStationFont, SubStationGraphic},
+    Format, Moment,
+};
 
 #[derive(Clone, Debug)]
 pub(crate) enum SubStationSection {

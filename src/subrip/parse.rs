@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until, take_while1},
     character::complete::{char, i64, line_ending, multispace0, space0, u32},
-    combinator::{eof, fail, map, opt, rest, value},
+    combinator::{eof, map, opt, rest, value, verify},
     multi::{many0, many_till, separated_list1},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult, Parser,
@@ -12,7 +12,7 @@ use nom::{
 
 use crate::{parsing::take_until_end_of_block, Moment, SubRipSubtitle};
 
-use super::data::SubRipEvent;
+use super::SubRipEvent;
 
 #[derive(Debug)]
 pub(crate) enum SubRipBlock {
@@ -69,15 +69,11 @@ pub(crate) fn parse_new_line(input: &str) -> IResult<&str, SubRipBlock> {
 }
 
 fn parse_continuation(input: &str) -> IResult<&str, SubRipBlock> {
-    // TODO: surely there's a better way to do this
-    let continuation = take_until_end_of_block.parse(input);
-    if let Ok(parsed) = continuation {
-        if !parsed.1.is_empty() {
-            return Ok((parsed.0, SubRipBlock::LineContinuation(parsed.1)));
-        }
-    }
-
-    fail(input)
+    map(
+        verify(take_until_end_of_block, |s: &String| !s.is_empty()),
+        SubRipBlock::LineContinuation,
+    )
+    .parse(input)
 }
 
 fn parse_block(input: &str) -> IResult<&str, SubRipBlock> {
@@ -134,11 +130,11 @@ pub(crate) fn parse_srt<T: Read>(reader: BufReader<T>) -> SubRipSubtitle {
     SubRipSubtitle::from_events(events)
 }
 
-fn parse_formatting_tag(input: &str) -> IResult<&str, &str> {
+fn discard_bracket_tag(input: &str) -> IResult<&str, &str> {
     value("", tuple((char('{'), take_until("}"), char('}')))).parse(input)
 }
 
-fn parse_html_tag(input: &str) -> IResult<&str, &str> {
+fn discard_html_tag(input: &str) -> IResult<&str, &str> {
     value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
 }
 
@@ -146,8 +142,8 @@ pub(crate) fn strip_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((
-                parse_html_tag,
-                parse_formatting_tag,
+                discard_html_tag,
+                discard_bracket_tag,
                 take_while1(|c| c != '<' && c != '{'),
                 rest,
             )),

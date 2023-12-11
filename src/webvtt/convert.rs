@@ -8,7 +8,7 @@ use nom::{
     IResult, Parser,
 };
 
-fn discard_tag(input: &str) -> IResult<&str, &str> {
+fn discard_html_tag(input: &str) -> IResult<&str, &str> {
     value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
 }
 
@@ -39,7 +39,7 @@ fn keep_html_tags(input: &str) -> IResult<&str, &str> {
 pub(crate) fn vtt_to_ass_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
-            alt((convert_to_ass_tag, discard_tag, take_until("<"), rest)),
+            alt((convert_to_ass_tag, discard_html_tag, take_until("<"), rest)),
             eof,
         ),
         |(v, _)| v.join(""),
@@ -50,16 +50,12 @@ pub(crate) fn vtt_to_ass_formatting(input: &str) -> IResult<&str, String> {
 pub(crate) fn vtt_to_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
-            alt((keep_html_tags, discard_tag, take_until("<"), rest)),
+            alt((keep_html_tags, discard_html_tag, take_until("<"), rest)),
             eof,
         ),
         |(v, _)| v.join(""),
     )
     .parse(input)
-}
-
-fn discard_html_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
 }
 
 pub(crate) fn discard_html_tags(input: &str) -> IResult<&str, String> {

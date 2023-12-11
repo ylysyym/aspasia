@@ -12,7 +12,7 @@ use nom::{
 
 use crate::{parsing::take_until_end_of_block, Moment, WebVttSubtitle};
 
-use super::data::WebVttCue;
+use super::WebVttCue;
 
 #[derive(Debug)]
 enum WebVttBlock {

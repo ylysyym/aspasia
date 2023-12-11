@@ -67,3 +67,16 @@ fn convert_newlines() {
         "Hello\nthere"
     );
 }
+
+#[test]
+fn ignore_invalid_lines() {
+    let sub = MicroDvdSubtitle::from_str(
+        "{0}{5}line
+{10}invalid
+{10}{15}more",
+    )
+    .unwrap();
+
+    assert_eq!(sub.events().len(), 2);
+    assert_eq!(sub.event(1).unwrap().text, "more");
+}

@@ -9,9 +9,9 @@ use nom::{
     IResult, Parser,
 };
 
-use crate::timing::Frame;
+use crate::{timing::Frame, MicroDvdSubtitle};
 
-use super::{data::MicroDvdSubtitle, MicroDvdEvent};
+use super::MicroDvdEvent;
 
 fn parse_frame(input: &str) -> IResult<&str, Frame> {
     map(delimited(char('{'), i64, char('}')), Frame::from).parse(input)
