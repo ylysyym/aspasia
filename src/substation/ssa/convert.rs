@@ -33,7 +33,7 @@ pub(crate) fn ssa_to_srt_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(v, _)| v.join(""),
+        |(v, _)| v.concat(),
     )
     .parse(input)
 }
@@ -49,7 +49,7 @@ pub(crate) fn ssa_to_vtt_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(v, _)| v.join(""),
+        |(v, _)| v.concat(),
     )
     .parse(input)
 }
@@ -57,7 +57,7 @@ pub(crate) fn ssa_to_vtt_formatting(input: &str) -> IResult<&str, String> {
 pub(crate) fn strip_formatting_tags(input: &str) -> IResult<&str, String> {
     map(
         many_till(alt((discard(bracket_tag), take_until("{"), rest)), eof),
-        |(s, _)| s.join("").to_string(),
+        |(s, _)| s.concat(),
     )
     .parse(input)
 }

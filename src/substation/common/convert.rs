@@ -37,7 +37,7 @@ pub(crate) fn split_formatting_tags(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(s, _)| s.join(""),
+        |(s, _)| s.concat(),
     )
     .parse(input)
 }

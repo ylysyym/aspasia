@@ -92,7 +92,7 @@ pub(crate) fn srt_to_ass_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(v, _)| v.join(""),
+        |(v, _)| v.concat(),
     )
     .parse(input)
 }
@@ -112,7 +112,7 @@ pub(crate) fn srt_to_ssa_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(v, _)| v.join(""),
+        |(v, _)| v.concat(),
     )
     .parse(input)
 }
@@ -130,7 +130,7 @@ pub(crate) fn srt_to_vtt_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(v, _)| v.join(""),
+        |(v, _)| v.concat(),
     )
     .parse(input)
 }

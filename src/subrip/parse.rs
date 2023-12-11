@@ -144,7 +144,7 @@ pub(crate) fn strip_srt_formatting(input: &str) -> IResult<&str, String> {
             )),
             eof,
         ),
-        |(s, _)| s.join("").to_string(),
+        |(s, _)| s.concat(),
     )
     .parse(input)
 }
