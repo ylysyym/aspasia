@@ -18,7 +18,7 @@ use crate::{
     TextSubtitle, TimedEvent, TimedEventInterface, TimedMicroDvdSubtitle, TimedSubtitleFile,
 };
 
-use super::{convert::discard_html_tags, parse::parse_vtt};
+use super::{convert::strip_html_tags, parse::parse_vtt};
 
 /// WebVTT (.vtt) subtitle data
 #[derive(Clone, Debug, Builder)]
@@ -366,7 +366,7 @@ impl From<PlainSubtitle> for WebVttSubtitle {
 
 impl TextEvent for WebVttCue {
     fn unformatted_text(&self) -> Cow<'_, String> {
-        let Ok((_, stripped)) = discard_html_tags(self.text.as_str()) else {
+        let Ok((_, stripped)) = strip_html_tags(self.text.as_str()) else {
             return Cow::Borrowed(&self.text);
         };
 

@@ -1,20 +1,13 @@
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until, take_while, take_while1},
-    character::complete::char,
     combinator::{eof, map, rest, value},
     multi::many_till,
-    sequence::{delimited, tuple},
+    sequence::delimited,
     IResult, Parser,
 };
 
-fn discard_html_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
-}
-
-fn discard_bracket_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('{'), take_until("}"), char('}')))).parse(input)
-}
+use crate::parsing::{bracket_tag, discard, html_tag};
 
 fn convert_to_ass_tag(input: &str) -> IResult<&str, &str> {
     alt((
@@ -90,8 +83,8 @@ pub(crate) fn srt_to_ass_formatting(input: &str) -> IResult<&str, String> {
             alt((
                 map(convert_to_ass_tag, std::string::ToString::to_string),
                 replace_font_color_tag,
-                map(discard_html_tag, std::string::ToString::to_string),
-                map(discard_bracket_tag, std::string::ToString::to_string),
+                map(discard(html_tag), std::string::ToString::to_string),
+                map(discard(bracket_tag), std::string::ToString::to_string),
                 map(take_while(|c| c != '<' && c != '{'), |s: &str| {
                     s.to_string()
                 }),
@@ -110,8 +103,8 @@ pub(crate) fn srt_to_ssa_formatting(input: &str) -> IResult<&str, String> {
             alt((
                 map(convert_to_ssa_tag, std::string::ToString::to_string),
                 replace_font_color_tag,
-                map(discard_html_tag, std::string::ToString::to_string),
-                map(discard_bracket_tag, std::string::ToString::to_string),
+                map(discard(html_tag), std::string::ToString::to_string),
+                map(discard(bracket_tag), std::string::ToString::to_string),
                 map(take_while(|c| c != '<' && c != '{'), |s: &str| {
                     s.to_string()
                 }),
@@ -130,8 +123,8 @@ pub(crate) fn srt_to_vtt_formatting(input: &str) -> IResult<&str, String> {
             alt((
                 convert_to_vtt_tag,
                 keep_html_tags,
-                discard_html_tag,
-                discard_bracket_tag,
+                discard(html_tag),
+                discard(bracket_tag),
                 take_while1(|c| c != '<' && c != '{'),
                 rest,
             )),

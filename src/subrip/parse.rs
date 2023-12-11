@@ -4,13 +4,16 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until, take_while1},
     character::complete::{char, i64, line_ending, multispace0, space0, u32},
-    combinator::{eof, map, opt, rest, value, verify},
-    multi::{many0, many_till, separated_list1},
+    combinator::{eof, map, opt, rest, verify},
+    multi::{many_till, separated_list1},
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult, Parser,
 };
 
-use crate::{parsing::take_until_end_of_block, Moment, SubRipSubtitle};
+use crate::{
+    parsing::{bracket_tag, discard, html_tag, take_until_end_of_block},
+    Moment, SubRipSubtitle,
+};
 
 use super::SubRipEvent;
 
@@ -52,7 +55,7 @@ fn parse_line_number(input: &str) -> IResult<&str, u32> {
 pub(crate) fn parse_new_line(input: &str) -> IResult<&str, SubRipBlock> {
     map(
         preceded(
-            many0(line_ending),
+            multispace0,
             tuple((parse_line_number, parse_timing, take_until_end_of_block)),
         ),
         |(line_number, ((start, end), coordinates), text)| {
@@ -77,7 +80,7 @@ fn parse_continuation(input: &str) -> IResult<&str, SubRipBlock> {
 }
 
 fn parse_block(input: &str) -> IResult<&str, SubRipBlock> {
-    alt((preceded(multispace0, parse_new_line), parse_continuation)).parse(input)
+    alt((parse_new_line, parse_continuation)).parse(input)
 }
 
 pub(crate) fn parse_blocks(input: &str) -> IResult<&str, Vec<SubRipBlock>> {
@@ -130,20 +133,12 @@ pub(crate) fn parse_srt<T: Read>(reader: BufReader<T>) -> SubRipSubtitle {
     SubRipSubtitle::from_events(events)
 }
 
-fn discard_bracket_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('{'), take_until("}"), char('}')))).parse(input)
-}
-
-fn discard_html_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
-}
-
 pub(crate) fn strip_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
             alt((
-                discard_html_tag,
-                discard_bracket_tag,
+                discard(html_tag),
+                discard(bracket_tag),
                 take_while1(|c| c != '<' && c != '{'),
                 rest,
             )),

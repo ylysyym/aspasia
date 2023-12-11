@@ -1,16 +1,12 @@
 use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
-    character::complete::char,
     combinator::{eof, map, rest, value},
     multi::many_till,
-    sequence::tuple,
     IResult, Parser,
 };
 
-fn discard_html_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('<'), take_until(">"), char('>')))).parse(input)
-}
+use crate::parsing::{discard, html_tag};
 
 fn convert_to_ass_tag(input: &str) -> IResult<&str, &str> {
     alt((
@@ -24,7 +20,7 @@ fn convert_to_ass_tag(input: &str) -> IResult<&str, &str> {
     .parse(input)
 }
 
-fn keep_html_tags(input: &str) -> IResult<&str, &str> {
+fn parse_webvtt_tags(input: &str) -> IResult<&str, &str> {
     alt((
         tag("<b>"),
         tag("</b>"),
@@ -39,7 +35,7 @@ fn keep_html_tags(input: &str) -> IResult<&str, &str> {
 pub(crate) fn vtt_to_ass_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
-            alt((convert_to_ass_tag, discard_html_tag, take_until("<"), rest)),
+            alt((convert_to_ass_tag, discard(html_tag), take_until("<"), rest)),
             eof,
         ),
         |(v, _)| v.join(""),
@@ -50,7 +46,7 @@ pub(crate) fn vtt_to_ass_formatting(input: &str) -> IResult<&str, String> {
 pub(crate) fn vtt_to_srt_formatting(input: &str) -> IResult<&str, String> {
     map(
         many_till(
-            alt((keep_html_tags, discard_html_tag, take_until("<"), rest)),
+            alt((parse_webvtt_tags, discard(html_tag), take_until("<"), rest)),
             eof,
         ),
         |(v, _)| v.join(""),
@@ -58,9 +54,9 @@ pub(crate) fn vtt_to_srt_formatting(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn discard_html_tags(input: &str) -> IResult<&str, String> {
+pub(crate) fn strip_html_tags(input: &str) -> IResult<&str, String> {
     map(
-        many_till(alt((discard_html_tag, take_until("<"), rest)), eof),
+        many_till(alt((discard(html_tag), take_until("<"), rest)), eof),
         |(s, _)| s.join("").to_string(),
     )
     .parse(input)

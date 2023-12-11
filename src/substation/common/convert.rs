@@ -4,15 +4,17 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, take_until},
     character::complete::char,
-    combinator::{eof, map, rest, value},
+    combinator::{eof, map, rest},
     multi::{many1, many_till},
-    sequence::{delimited, preceded, tuple},
+    sequence::{delimited, preceded},
     IResult, Parser,
 };
 
+use crate::parsing::bracket_tag;
+
 // Split a sequence of {\b1\i1} into {\b1}{\i1}
 fn split_tag(input: &str) -> IResult<&str, String> {
-    delimited(char('{'), take_until("}"), char('}'))
+    bracket_tag
         .and_then(map(
             many1(preceded(char('\\'), alt((take_until("\\"), rest)))),
             |v| {
@@ -40,10 +42,6 @@ pub(crate) fn split_formatting_tags(input: &str) -> IResult<&str, String> {
     .parse(input)
 }
 
-pub(crate) fn discard_tag(input: &str) -> IResult<&str, &str> {
-    value("", tuple((char('{'), take_until("}"), char('}')))).parse(input)
-}
-
 fn convert_hex(input: &str) -> String {
     let s = format!("{input:06}");
     let mut result = String::new();
@@ -55,14 +53,13 @@ fn convert_hex(input: &str) -> String {
 }
 
 pub(crate) fn convert_font_color_tag(input: &str) -> IResult<&str, String> {
-    alt((
-        map(
-            delimited(tag("{\\1c&H"), take_until("&}"), tag("&}")),
-            |s| format!("<font color=\"#{}\">", convert_hex(s)),
+    map(
+        delimited(
+            alt((tag("{\\1c&H"), tag("{\\c&H"))),
+            take_until("&}"),
+            tag("&}"),
         ),
-        map(delimited(tag("{\\c&H"), take_until("&}"), tag("&}")), |s| {
-            format!("<font color=\"#{}\">", convert_hex(s))
-        }),
-    ))
+        |s| format!("<font color=\"#{}\">", convert_hex(s)),
+    )
     .parse(input)
 }
