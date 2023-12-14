@@ -222,10 +222,8 @@ impl From<&WebVttSubtitle> for SubRipSubtitle {
                 .iter()
                 .enumerate()
                 .map(|(i, cue)| {
-                    let mut text = cue.text.clone();
-                    if let Ok((_, converted)) = vtt_to_srt_formatting(text.as_str()) {
-                        text = converted;
-                    }
+                    let result = vtt_to_srt_formatting(cue.text.as_str());
+                    let text = result.map_or_else(|_| cue.text.clone(), |(_, s)| s);
 
                     let identifier = cue
                         .identifier

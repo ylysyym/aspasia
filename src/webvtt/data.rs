@@ -287,10 +287,9 @@ impl From<&SubRipSubtitle> for WebVttSubtitle {
                 .events()
                 .iter()
                 .map(|line| {
-                    let mut text = line.text.clone();
-                    if let Ok((_, converted)) = srt_to_vtt_formatting(text.as_str()) {
-                        text = converted;
-                    }
+                    let result = srt_to_vtt_formatting(line.text.as_str());
+                    let text = result.map_or_else(|_| line.text.clone(), |(_, s)| s);
+
                     WebVttCue {
                         identifier: Some(line.line_number.to_string()),
                         text,
@@ -409,7 +408,7 @@ impl Display for WebVttCue {
         write!(
             f,
             "{}{}{} --> {}{}\n{}",
-            self.identifier.clone().unwrap_or_default().as_str(),
+            self.identifier.clone().unwrap_or_default(),
             if self.identifier.is_some() { "\n" } else { "" },
             self.start.as_vtt_timestamp(),
             self.end.as_srt_timestamp(),
