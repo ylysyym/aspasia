@@ -31,7 +31,7 @@ You can add aspasia to your project using Cargo: `cargo add aspasia`
 
 ```toml
 [dependencies]
-aspasia = "0.1"
+aspasia = "0.2"
 ```
 
 ### Examples
