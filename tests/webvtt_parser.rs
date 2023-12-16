@@ -64,3 +64,24 @@ is!",
     assert_eq!(vtt.event(0).unwrap().text, "What\na\ngreat\nday");
     assert_eq!(vtt.event(1).unwrap().text, "it\nis!");
 }
+
+#[test]
+fn invalid_block() {
+    let vtt = WebVttSubtitle::from_str(
+        "WEBVTT
+    
+00:00:00.900 --> 00:00:03.350
+Text
+
+Invalid stuff
+
+00:00:06.100 --> 00:00:09.800
+More text
+",
+    )
+    .unwrap();
+
+    assert_eq!(vtt.events().len(), 2);
+    assert_eq!(vtt.event(0).unwrap().text, "Text");
+    assert_eq!(vtt.event(1).unwrap().text, "More text");
+}

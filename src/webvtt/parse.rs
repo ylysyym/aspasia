@@ -4,7 +4,7 @@ use nom::{
     branch::alt,
     bytes::complete::{tag, tag_no_case, take_until},
     character::complete::{char, i64, line_ending, multispace0, space0, space1},
-    combinator::{map, opt, value},
+    combinator::{map, opt, rest, value},
     multi::separated_list1,
     sequence::{delimited, pair, preceded, separated_pair, terminated, tuple},
     IResult, Parser,
@@ -15,11 +15,12 @@ use crate::{parsing::take_until_end_of_block, Moment, WebVttSubtitle};
 use super::WebVttCue;
 
 #[derive(Debug)]
-enum WebVttBlock {
+enum WebVttBlock<'a> {
     Cue(WebVttCue),
     Note(String),
     Style(String),
     Region(String),
+    Invalid(&'a str),
 }
 
 pub(crate) fn parse_header(input: &str) -> IResult<&str, Option<&str>> {
@@ -117,10 +118,20 @@ fn parse_region(input: &str) -> IResult<&str, WebVttBlock> {
     .parse(input)
 }
 
+fn parse_invalid(input: &str) -> IResult<&str, WebVttBlock> {
+    map(alt((take_until("\n\n"), rest)), WebVttBlock::Invalid).parse(input)
+}
+
 fn parse_block(input: &str) -> IResult<&str, WebVttBlock> {
     preceded(
         multispace0,
-        alt((parse_cue, parse_style, parse_note, parse_region)),
+        alt((
+            parse_cue,
+            parse_style,
+            parse_note,
+            parse_region,
+            parse_invalid,
+        )),
     )
     .parse(input)
 }
@@ -171,7 +182,7 @@ pub(crate) fn parse_vtt<T: Read>(reader: BufReader<T>) -> WebVttSubtitle {
                 WebVttBlock::Cue(cue) => cues.push(cue),
                 WebVttBlock::Style(style) => styles.push(style),
                 WebVttBlock::Region(region) => regions.push(region),
-                WebVttBlock::Note(_) => {}
+                _ => {}
             }
         }
 
