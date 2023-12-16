@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.2.0
 
 - Fixed parsing problems when last event of SubRip file contained a blank line
 - Fixed WebVTT parsing logic to skip over invalid/unparsable blocks instead of stopping prematurely
