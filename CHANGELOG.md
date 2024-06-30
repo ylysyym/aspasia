@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1
+
+- Fixed WebVTT output to remove extraneous newlines between cues
+- Fixed WebVTT output to use correctly formatted timestamps
+
 ## 0.2.0
 
 - Fixed parsing problems when last event of SubRip file contained a blank line
