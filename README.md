@@ -89,7 +89,7 @@ See [examples](examples) folder for more
 
 ## Roadmap
 
-aspasia is currently under heavy development, and its API is not particularly stable. Once both API and functionality are relatively stable, I would like to release a 1.0 version. To that end, any feedback, bug reports, or other forms of contribution are very welcome.
+aspasia is currently under development, and its API is not necessarily stable. Once both API and functionality are relatively stable, I would like to release a 1.0 version. To that end, any feedback, bug reports, or other forms of contribution are very welcome.
 
 ### Planned
 
