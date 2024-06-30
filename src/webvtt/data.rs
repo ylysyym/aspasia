@@ -168,8 +168,9 @@ impl Display for WebVttSubtitle {
             }
         }
         if !self.cues.is_empty() {
+            writeln!(f)?;
             for line in &self.cues {
-                writeln!(f, "\n{line}")?;
+                writeln!(f, "{line}")?;
             }
         }
 
@@ -411,7 +412,7 @@ impl Display for WebVttCue {
             self.identifier.clone().unwrap_or_default(),
             if self.identifier.is_some() { "\n" } else { "" },
             self.start.as_vtt_timestamp(),
-            self.end.as_srt_timestamp(),
+            self.end.as_vtt_timestamp(),
             self.settings.as_deref().unwrap_or_default(),
             self.text,
         )

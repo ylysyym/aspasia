@@ -19,3 +19,39 @@ fn strip_vtt_format() {
     assert_eq!(vtt.events().len(), 1);
     assert_eq!(vtt.event(0).unwrap().text, "Had it up to here");
 }
+
+#[test]
+fn output() {
+    let vtt = WebVttSubtitle::from_str(
+        "WEBVTT
+    
+00:00:00.650 --> 00:00:01.200
+something
+
+NOTE ignore this please
+
+
+00:00:04.000 --> 00:00:06.000
+anything
+
+
+00:00:10.100 --> 00:00:18.999
+everything
+",
+    );
+
+    assert_eq!(
+        vtt.unwrap().to_string(),
+        "WEBVTT
+
+00:00:00.650 --> 00:00:01.200
+something
+
+00:00:04.000 --> 00:00:06.000
+anything
+
+00:00:10.100 --> 00:00:18.999
+everything
+"
+    );
+}
