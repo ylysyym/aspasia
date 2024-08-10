@@ -170,6 +170,7 @@ impl Display for WebVttSubtitle {
         if !self.cues.is_empty() {
             writeln!(f)?;
             for line in &self.cues {
+                writeln!(f)?;
                 writeln!(f, "{line}")?;
             }
         }
