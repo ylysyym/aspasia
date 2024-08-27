@@ -21,7 +21,7 @@ fn strip_vtt_format() {
 }
 
 #[test]
-fn output() {
+fn basic_output() {
     let vtt = WebVttSubtitle::from_str(
         "WEBVTT
     
@@ -52,6 +52,44 @@ anything
 
 00:00:10.100 --> 00:00:18.999
 everything
+"
+    );
+}
+
+#[test]
+fn identifiers() {
+    let vtt = WebVttSubtitle::from_str(
+        "WEBVTT
+
+1
+00:00:00.650 --> 00:00:01.200
+foo
+
+2
+00:00:04.000 --> 00:00:06.000
+bar
+
+3
+00:00:10.100 --> 00:00:18.999
+baz
+",
+    );
+
+    assert_eq!(
+        vtt.unwrap().to_string(),
+        "WEBVTT
+
+1
+00:00:00.650 --> 00:00:01.200
+foo
+
+2
+00:00:04.000 --> 00:00:06.000
+bar
+
+3
+00:00:10.100 --> 00:00:18.999
+baz
 "
     );
 }

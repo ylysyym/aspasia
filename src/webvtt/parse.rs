@@ -74,7 +74,7 @@ fn parse_cue(input: &str) -> IResult<&str, WebVttBlock> {
         tuple((
             alt((
                 pair(opt(parse_cue_identifier), parse_cue_timing),
-                pair(opt(space0), parse_cue_timing),
+                pair(opt(space1), parse_cue_timing),
             )),
             take_until_end_of_block,
         )),
