@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt::Display, fs::File, io::BufReader, path::Path, str::FromStr};
 
-use buildstructor::Builder;
+use bon::Builder;
 use encoding_rs::Encoding;
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
@@ -9,7 +9,10 @@ use crate::{
     errors::Error,
     plain::PlainSubtitle,
     subrip::convert::srt_to_ass_formatting,
-    substation::common::data::{SubStationEventKind, SubStationFont, SubStationGraphic},
+    substation::common::{
+        convert::map_bool,
+        data::{SubStationEventKind, SubStationFont, SubStationGraphic},
+    },
     traits::TimedSubtitle,
     webvtt::convert::vtt_to_ass_formatting,
     Moment, SsaSubtitle, SubRipSubtitle, Subtitle, TextEvent, TextEventInterface, TextSubtitle,
@@ -19,26 +22,43 @@ use crate::{
 use super::{convert::strip_formatting_tags, parse::parse_ass};
 
 /// Advanced SubStation Alpha v4+ (.ass) subtitle
-#[derive(Debug, Builder)]
+#[derive(Debug, Default, Builder)]
 pub struct AssSubtitle {
     /// Script info
+    #[builder(default)]
     script_info: AssScriptInfo,
+
     // Store different event types separately so that we can return dialogue only without having to filter
     /// Dialogue events
+    #[builder(default)]
     dialogue: Vec<AssEvent>,
+
     /// Picture events
+    #[builder(default)]
     pictures: Vec<AssEvent>,
+
     /// Sound events
+    #[builder(default)]
     sounds: Vec<AssEvent>,
+
     /// Movie events
+    #[builder(default)]
     movies: Vec<AssEvent>,
+
     /// Command events
+    #[builder(default)]
     commands: Vec<AssEvent>,
+
     /// Styles
+    #[builder(default)]
     styles: Vec<AssStyle>,
+
     /// Embedded font data
+    #[builder(default)]
     fonts: Vec<SubStationFont>,
+
     /// Embedded graphics data
+    #[builder(default)]
     graphics: Vec<SubStationGraphic>,
 }
 
@@ -139,15 +159,15 @@ pub struct AssStyle {
     /// Height scale of text
     pub scale_y: i64,
     /// Font spacing of text
-    pub spacing: i64,
+    pub spacing: f64,
     /// Number of degrees to rotate text by
     pub angle: f64,
     /// Style of text border
     pub border_style: i64,
     /// Width of text outline
-    pub outline: i64,
+    pub outline: f64,
     /// Depth of text shadow
-    pub shadow: i64,
+    pub shadow: f64,
     /// Alignment of text on screen
     pub alignment: i64,
     /// Left margin in pixels
@@ -374,7 +394,7 @@ impl Display for AssSubtitle {
             writeln!(f, "[Events]")?;
             writeln!(
                 f,
-                "Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text"
+                "Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text"
             )?;
             for event in &self.dialogue {
                 writeln!(f, "{event}")?;
@@ -404,14 +424,6 @@ impl FromStr for AssSubtitle {
         let reader = BufReader::new(s.as_bytes());
 
         Ok(parse_ass(reader))
-    }
-}
-
-impl Default for AssSubtitle {
-    fn default() -> Self {
-        Self::builder()
-            .script_info(AssScriptInfo::default())
-            .build()
     }
 }
 
@@ -515,7 +527,11 @@ impl From<&WebVttSubtitle> for AssSubtitle {
     /// All other tags and styles are discarded.
     fn from(value: &WebVttSubtitle) -> Self {
         AssSubtitle::builder()
-            .script_info(AssScriptInfo::builder().and_title(value.header()).build())
+            .script_info(
+                AssScriptInfo::builder()
+                    .maybe_title(value.header().cloned())
+                    .build(),
+            )
             .dialogue(
                 value
                     .events()
@@ -700,7 +716,7 @@ impl Display for AssScriptInfo {
             write!(f, "\nUpdate Details: {update_details}")?;
         }
         if let Some(script_type) = &self.script_type {
-            write!(f, "\nScript Type: {script_type}")?;
+            write!(f, "\nScriptType: {script_type}")?;
         }
         if let Some(collisions) = &self.collisions {
             write!(f, "\nCollisions: {collisions}")?;
@@ -727,7 +743,9 @@ impl Display for AssScriptInfo {
 
 impl Default for AssScriptInfo {
     fn default() -> Self {
-        AssScriptInfo::builder().script_type("v4.00+").build()
+        AssScriptInfo::builder()
+            .script_type("v4.00+".to_string())
+            .build()
     }
 }
 
@@ -735,7 +753,7 @@ impl Display for AssStyle {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
+            "Style: {},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{},{}",
             self.name,
             self.fontname,
             self.fontsize,
@@ -743,10 +761,10 @@ impl Display for AssStyle {
             self.secondary_colour,
             self.outline_colour,
             self.back_colour,
-            self.bold,
-            self.italic,
-            self.underline,
-            self.strike_out,
+            map_bool(self.bold),
+            map_bool(self.italic),
+            map_bool(self.underline),
+            map_bool(self.strike_out),
             self.scale_x,
             self.scale_y,
             self.spacing,

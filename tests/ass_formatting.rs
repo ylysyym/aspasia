@@ -5,7 +5,7 @@ use aspasia::{AssSubtitle, Subtitle, TextEvent, TextSubtitle};
 const SUB_TEXT: &str = "[Script Info]
 
 [Events]
-Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:27.92,0:00:30.26,*Default,NTP,0000,0000,0000,,- Oh\\N{\\fnArial}{\\b0}{\\fs14}{\\3c&H202020&}{\\shad1}- That's right
 ";
 
@@ -39,7 +39,7 @@ fn remove_drawing_spans() {
         "[Script Info]
 
 [Events]
-Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:06.00,0:00:10.30,*Default,NTP,0000,0000,0000,,Oh, {\\b1\\p9}yes.
 Dialogue: 0,0:00:14.80,0:00:19.90,*Default,NTP,0000,0000,0000,,Well, {\\p1}yes, but {\\p0}no.
 ",

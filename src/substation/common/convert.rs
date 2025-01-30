@@ -63,3 +63,11 @@ pub(crate) fn convert_font_color_tag(input: &str) -> IResult<&str, String> {
     )
     .parse(input)
 }
+
+pub(crate) fn map_bool(b: bool) -> &'static str {
+    if b {
+        "-1"
+    } else {
+        "0"
+    }
+}

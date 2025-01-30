@@ -133,6 +133,7 @@ impl TimedMicroDvdSubtitle {
     /// Modify framerate associated with subtitle
     ///
     /// This will also recalculate and update all event timings to match the new framerate.
+    #[expect(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
     pub fn update_framerate(&mut self, framerate: FrameRate) {
         let ratio = self.framerate / framerate;
         for event in &mut self.events {

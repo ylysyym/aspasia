@@ -13,7 +13,7 @@ license = "0BSD"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-buildstructor = "0.5"
+bon = "3.3.2"
 chardetng = "0.1"
 encoding_rs = "0.8"
 encoding_rs_io = "0.1"

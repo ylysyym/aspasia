@@ -258,10 +258,12 @@ impl Display for Frame {
     }
 }
 
+#[expect(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
 pub(crate) fn moment_to_frame(moment: Moment, framerate: f32) -> Frame {
     Frame(((i64::from(moment) as f32) * framerate / 1000.0).round() as i64)
 }
 
+#[expect(clippy::cast_possible_truncation, clippy::cast_precision_loss)]
 pub(crate) fn frame_to_moment(frame: Frame, framerate: f32) -> Moment {
     Moment(((frame.0 * 1000) as f32 / framerate).round() as i64)
 }

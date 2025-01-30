@@ -9,7 +9,7 @@ fn ass_to_srt_format() {
         "[Script Info]
 
 [Events]
-Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:27.92,0:00:30.26,*Default,NTP,0000,0000,0000,,- Oh\\N{\\b1\\i1}{\\fs14\\1c&HFF2022&}{\\shad1}- That's right
 ",
     )
@@ -30,7 +30,7 @@ fn ass_to_vtt_format() {
         "[Script Info]
 
 [Events]
-Format: Layer, Start, End, Style, Actor, MarginL, MarginR, MarginV, Effect, Text
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
 Dialogue: 0,0:00:27.92,0:00:30.26,*Default,NTP,0000,0000,0000,,- Oh\\N{\\b1\\i1}{\\fs14\\1c&HFF2022&}{\\shad1}- That's right
 ",
     )

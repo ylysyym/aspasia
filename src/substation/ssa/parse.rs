@@ -250,22 +250,20 @@ fn parse_nothing(input: &str) -> IResult<&str, SsaCategory> {
 
 fn build_script_info(data: &HashMap<String, String>) -> SsaScriptInfo {
     SsaScriptInfo {
-        title: data.get("Title").map(std::clone::Clone::clone),
-        original_script: data.get("Original Script").map(std::clone::Clone::clone),
-        original_translation: data
-            .get("Original Translation")
-            .map(std::clone::Clone::clone),
-        original_editing: data.get("Original Editing").map(std::clone::Clone::clone),
-        original_timing: data.get("Original Timing").map(std::clone::Clone::clone),
-        synch_point: data.get("Synch Point").map(std::clone::Clone::clone),
-        script_updated_by: data.get("Script Updated By").map(std::clone::Clone::clone),
-        update_details: data.get("Update Details").map(std::clone::Clone::clone),
-        script_type: data.get("ScriptType").map(std::clone::Clone::clone),
-        collisions: data.get("Collisions").map(std::clone::Clone::clone),
-        play_res_y: data.get("PlayResY").map(std::clone::Clone::clone),
-        play_res_x: data.get("PlayResX").map(std::clone::Clone::clone),
-        play_depth: data.get("PlayDepth").map(std::clone::Clone::clone),
-        timer: data.get("Timer").map(std::clone::Clone::clone),
+        title: data.get("Title").cloned(),
+        original_script: data.get("Original Script").cloned(),
+        original_translation: data.get("Original Translation").cloned(),
+        original_editing: data.get("Original Editing").cloned(),
+        original_timing: data.get("Original Timing").cloned(),
+        synch_point: data.get("Synch Point").cloned(),
+        script_updated_by: data.get("Script Updated By").cloned(),
+        update_details: data.get("Update Details").cloned(),
+        script_type: data.get("ScriptType").cloned(),
+        collisions: data.get("Collisions").cloned(),
+        play_res_y: data.get("PlayResY").cloned(),
+        play_res_x: data.get("PlayResX").cloned(),
+        play_depth: data.get("PlayDepth").cloned(),
+        timer: data.get("Timer").cloned(),
     }
 }
 

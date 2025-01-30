@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt::Display, fs::File, io::BufReader, path::Path, str::FromStr};
 
-use buildstructor::Builder;
+use bon::Builder;
 use encoding_rs::Encoding;
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
@@ -9,7 +9,10 @@ use crate::{
     errors::Error,
     plain::PlainSubtitle,
     subrip::convert::srt_to_ssa_formatting,
-    substation::common::data::{SubStationEventKind, SubStationFont, SubStationGraphic},
+    substation::common::{
+        convert::map_bool,
+        data::{SubStationEventKind, SubStationFont, SubStationGraphic},
+    },
     traits::TimedSubtitle,
     webvtt::convert::vtt_to_ass_formatting,
     AssSubtitle, Moment, SubRipSubtitle, Subtitle, TextEvent, TextEventInterface, TextSubtitle,
@@ -19,26 +22,43 @@ use crate::{
 use super::{convert::strip_formatting_tags, parse::parse_ssa};
 
 /// SubStation Alpha v4 (.ssa) subtitle
-#[derive(Debug, Builder)]
+#[derive(Debug, Default, Builder)]
 pub struct SsaSubtitle {
     /// Script info
+    #[builder(default)]
     script_info: SsaScriptInfo,
+
     // Store different event types separately so that we can return dialogue only without having to filter
     /// Dialogue events
+    #[builder(default)]
     dialogue: Vec<SsaEvent>,
+
     /// Picture events
+    #[builder(default)]
     pictures: Vec<SsaEvent>,
+
     /// Sound events
+    #[builder(default)]
     sounds: Vec<SsaEvent>,
+
     /// Movie events
+    #[builder(default)]
     movies: Vec<SsaEvent>,
+
     /// Command events
+    #[builder(default)]
     commands: Vec<SsaEvent>,
+
     /// Styles
+    #[builder(default)]
     styles: Vec<SsaStyle>,
+
     /// Embedded font data
+    #[builder(default)]
     fonts: Vec<SubStationFont>,
+
     /// Embedded graphics data
+    #[builder(default)]
     graphics: Vec<SubStationGraphic>,
 }
 
@@ -393,14 +413,6 @@ impl FromStr for SsaSubtitle {
     }
 }
 
-impl Default for SsaSubtitle {
-    fn default() -> Self {
-        Self::builder()
-            .script_info(SsaScriptInfo::default())
-            .build()
-    }
-}
-
 // TODO convert styles etc
 impl From<&AssSubtitle> for SsaSubtitle {
     fn from(value: &AssSubtitle) -> Self {
@@ -501,7 +513,11 @@ impl From<&WebVttSubtitle> for SsaSubtitle {
     /// All other tags and styles are discarded.
     fn from(value: &WebVttSubtitle) -> Self {
         SsaSubtitle::builder()
-            .script_info(SsaScriptInfo::builder().and_title(value.header()).build())
+            .script_info(
+                SsaScriptInfo::builder()
+                    .maybe_title(value.header().cloned())
+                    .build(),
+            )
             .dialogue(
                 value
                     .events()
@@ -686,7 +702,7 @@ impl Display for SsaScriptInfo {
             write!(f, "\nUpdate Details: {update_details}")?;
         }
         if let Some(script_type) = &self.script_type {
-            write!(f, "\nScript Type: {script_type}")?;
+            write!(f, "\nScriptType: {script_type}")?;
         }
         if let Some(collisions) = &self.collisions {
             write!(f, "\nCollisions: {collisions}")?;
@@ -710,7 +726,9 @@ impl Display for SsaScriptInfo {
 
 impl Default for SsaScriptInfo {
     fn default() -> Self {
-        SsaScriptInfo::builder().script_type("v4.00").build()
+        SsaScriptInfo::builder()
+            .script_type("v4.00".to_string())
+            .build()
     }
 }
 
@@ -726,8 +744,8 @@ impl Display for SsaStyle {
             self.secondary_colour,
             self.tertiary_colour,
             self.back_colour,
-            self.bold,
-            self.italic,
+            map_bool(self.bold),
+            map_bool(self.italic),
             self.border_style,
             self.outline,
             self.shadow,

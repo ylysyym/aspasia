@@ -161,31 +161,31 @@ fn parse_style_line(input: &str) -> IResult<&str, AssCategory> {
             tuple((tag_no_case("Style"), space0, char(':'), space0)),
             pair(
                 tuple((
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(take_until(","), pair(char(','), space0)),
-                    terminated(parse_reverse_bool, pair(char(','), space0)),
-                    terminated(parse_reverse_bool, pair(char(','), space0)),
-                    terminated(parse_reverse_bool, pair(char(','), space0)),
-                    terminated(parse_reverse_bool, pair(char(','), space0)),
+                    terminated(take_until(","), pair(char(','), space0)), // Name
+                    terminated(take_until(","), pair(char(','), space0)), // Fontname
+                    terminated(i64, pair(char(','), space0)),             // Fontsize
+                    terminated(take_until(","), pair(char(','), space0)), // PrimaryColour
+                    terminated(take_until(","), pair(char(','), space0)), // SecondaryColour
+                    terminated(take_until(","), pair(char(','), space0)), // OutlineColour
+                    terminated(take_until(","), pair(char(','), space0)), // BackColour
+                    terminated(parse_reverse_bool, pair(char(','), space0)), // Bold
+                    terminated(parse_reverse_bool, pair(char(','), space0)), // Italic
+                    terminated(parse_reverse_bool, pair(char(','), space0)), // Underline
+                    terminated(parse_reverse_bool, pair(char(','), space0)), // StrikeOut
                 )),
                 tuple((
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(double, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    terminated(i64, pair(char(','), space0)),
-                    i64,
+                    terminated(i64, pair(char(','), space0)),    // ScaleX
+                    terminated(i64, pair(char(','), space0)),    // ScaleY
+                    terminated(double, pair(char(','), space0)), // Spacing
+                    terminated(double, pair(char(','), space0)), // Angle
+                    terminated(i64, pair(char(','), space0)),    // BorderStyle
+                    terminated(double, pair(char(','), space0)), // Outline
+                    terminated(double, pair(char(','), space0)), // Shadow
+                    terminated(i64, pair(char(','), space0)),    // Alignment
+                    terminated(i64, pair(char(','), space0)),    // MarginL
+                    terminated(i64, pair(char(','), space0)),    // MarginR
+                    terminated(i64, pair(char(','), space0)),    // MarginV
+                    i64,                                         // Encoding
                 )),
             ),
         ),
@@ -270,23 +270,21 @@ fn parse_nothing(input: &str) -> IResult<&str, AssCategory> {
 
 fn build_script_info(data: &HashMap<String, String>) -> AssScriptInfo {
     AssScriptInfo {
-        title: data.get("Title").map(std::clone::Clone::clone),
-        original_script: data.get("Original Script").map(std::clone::Clone::clone),
-        original_translation: data
-            .get("Original Translation")
-            .map(std::clone::Clone::clone),
-        original_editing: data.get("Original Editing").map(std::clone::Clone::clone),
-        original_timing: data.get("Original Timing").map(std::clone::Clone::clone),
-        synch_point: data.get("Synch Point").map(std::clone::Clone::clone),
-        script_updated_by: data.get("Script Updated By").map(std::clone::Clone::clone),
-        update_details: data.get("Update Details").map(std::clone::Clone::clone),
-        script_type: data.get("ScriptType").map(std::clone::Clone::clone),
-        collisions: data.get("Collisions").map(std::clone::Clone::clone),
-        play_res_y: data.get("PlayResY").map(std::clone::Clone::clone),
-        play_res_x: data.get("PlayResX").map(std::clone::Clone::clone),
-        play_depth: data.get("PlayDepth").map(std::clone::Clone::clone),
-        timer: data.get("Timer").map(std::clone::Clone::clone),
-        wrap_style: data.get("WrapStyle").map(std::clone::Clone::clone),
+        title: data.get("Title").cloned(),
+        original_script: data.get("Original Script").cloned(),
+        original_translation: data.get("Original Translation").cloned(),
+        original_editing: data.get("Original Editing").cloned(),
+        original_timing: data.get("Original Timing").cloned(),
+        synch_point: data.get("Synch Point").cloned(),
+        script_updated_by: data.get("Script Updated By").cloned(),
+        update_details: data.get("Update Details").cloned(),
+        script_type: data.get("ScriptType").cloned(),
+        collisions: data.get("Collisions").cloned(),
+        play_res_y: data.get("PlayResY").cloned(),
+        play_res_x: data.get("PlayResX").cloned(),
+        play_depth: data.get("PlayDepth").cloned(),
+        timer: data.get("Timer").cloned(),
+        wrap_style: data.get("WrapStyle").cloned(),
     }
 }
 

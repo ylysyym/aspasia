@@ -1,6 +1,6 @@
 use std::{borrow::Cow, fmt::Display, fs::File, io::BufReader, path::Path, str::FromStr};
 
-use buildstructor::Builder;
+use bon::Builder;
 use encoding_rs::Encoding;
 use encoding_rs_io::DecodeReaderBytesBuilder;
 
@@ -186,12 +186,6 @@ impl FromStr for WebVttSubtitle {
         let reader = BufReader::new(s.as_bytes());
 
         Ok(parse_vtt(reader))
-    }
-}
-
-impl Default for WebVttSubtitle {
-    fn default() -> Self {
-        Self::builder().build()
     }
 }
 

@@ -17,9 +17,11 @@ use super::WebVttCue;
 #[derive(Debug)]
 enum WebVttBlock<'a> {
     Cue(WebVttCue),
+    #[expect(unused)]
     Note(String),
     Style(String),
     Region(String),
+    #[expect(unused)]
     Invalid(&'a str),
 }
 
@@ -190,7 +192,7 @@ pub(crate) fn parse_vtt<T: Read>(reader: BufReader<T>) -> WebVttSubtitle {
     }
 
     WebVttSubtitle::builder()
-        .and_header(header)
+        .maybe_header(header)
         .cues(cues)
         .styles(styles)
         .regions(regions)
